@@ -1,0 +1,13 @@
+#!/usr/lib/ckan/bin/python
+import sys
+import os
+from pkg_resources import load_entry_point
+
+assert os.getuid() in (33, 0), 'need to be root or www-data'
+
+os.setuid(33)
+
+if __name__ == '__main__':
+    sys.exit(
+        load_entry_point('ckan', 'console_scripts', 'ckan')()
+    )
