@@ -15,12 +15,17 @@ host = 0.0.0.0
 port = 5000
 
 [app:main]
+
+#This should be changed
+ckan.site_id = ckan
+
 use = egg:ckan
 full_stack = true
-cache_dir = %(here)s/data
 beaker.session.key = ckan
 beaker.session.secret = NiMK5GFbiE2esKHsaZvZCkomR
-app_instance_uuid = {c2ab5a16-69f7-4e53-b7a1-6a8ae600db3a}
+app_instance_uuid = c2ab5a16-69f7-4e53-b7a1-6a8ae600db3a
+cache_dir = /tmp/%(ckan.site_id)s/
+
 
 # List the names of CKAN extensions to activate.
 # Note: This line is required to be here for packaging, even if it is empty.
@@ -45,9 +50,9 @@ sqlalchemy.url = postgresql://ckanuser:pass@localhost/ckantest
 #sqlalchemy.url = sqlite:///%(here)s/somedb.db
 
 # repoze.who config
-who.config_file = %(here)s/who.ini
+who.config_file = /etc/ckan/who.ini
 who.log_level = warning
-who.log_file = %(cache_dir)s/who_log.ini
+#who.log_file = %(cache_dir)s/who_log.ini
 
 # Location of RDF versions of datasets
 #rdf_packages = http://semantic.ckan.net/record/
@@ -214,24 +219,24 @@ ckan.feeds.author_link =
 keys = root, ckan, ckanext
 
 [handlers]
-keys = console, file
+keys = console
 
 [formatters]
 keys = generic
 
 [logger_root]
 level = WARNING
-handlers = console, file
+handlers = console
 
 [logger_ckan]
 level = INFO
-handlers = console, file
+handlers = console
 qualname = ckan
 propagate = 0
 
 [logger_ckanext]
 level = DEBUG
-handlers = console, file
+handlers = console
 qualname = ckanext
 propagate = 0
 
@@ -241,11 +246,11 @@ args = (sys.stderr,)
 level = NOTSET
 formatter = generic
 
-[handler_file]
-class = logging.handlers.RotatingFileHandler
-formatter = generic
-level = NOTSET
-args = ("ckan.log", "a", 20000000, 9)
+#[handler_file]
+#class = logging.handlers.RotatingFileHandler
+#formatter = generic
+#level = NOTSET
+#args = ("ckan.log", "a", 20000000, 9)
 
 [formatter_generic]
 format = %(asctime)s %(levelname)-5.5s [%(name)s] %(message)s
