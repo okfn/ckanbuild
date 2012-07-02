@@ -23,7 +23,7 @@ it to generate the new `ckan-bootstrap.py`.
 [fpm](https://github.com/jordansissel/fpm) to package up the entire virtualenv
 into a Debian package.
 
-In `.etc/apache2/sites-available/ckan` there should be one Apache config file
+In `./etc/apache2/sites-available/ckan` there should be one Apache config file
 for each CKAN website on the server (todo).
 
 In `./etc/ckan/` there should be a subdir for each CKAN site containing
