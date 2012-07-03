@@ -1,6 +1,41 @@
 ckanbuild
 =========
 
+Installation
+------------
+
+To use ckanbuild you must first install the following dependencies:
+
+* [Python](http://python.org/)
+* [Git](http://git-scm.com/)
+* [virtualenv](http://www.virtualenv.org/): `pip install virtualenv`
+* [fpm](https://github.com/jordansissel/fpm/): `gem install fpm`
+
+Then to get ckanbuild itself simply clone the ckanbuild git repo:
+
+    git clone https://github.com/okfn/ckanbuild.git
+
+Usage
+-----
+
+To build the CKAN Debian package, run:
+
+    ./build.sh
+
+Troubleshooting
+---------------
+
+If you get errors from fpm like one of these:
+
+    `utime': No such file or directory - /tmp/package-dir-staging20120703-30729-jkji81/usr/lib/ckan/src/ckan/who.ini
+
+    `utime': Operation not permitted - /tmp/package-dir-staging20120703-28058-164vj7h/usr/lib/ckan/lib/python2.7/sre.py (Errno::EPERM)
+
+try downgrading to fpm 0.4.9: `gem install fpm -v 0.4.9`
+
+How it Works
+------------
+
 ckanbuild is a script for deploying and managing single or multiple CKAN
 websites.
 
@@ -31,6 +66,9 @@ In `./etc/ckan/` there should be a subdir for each CKAN site containing
 
 `./usr/bin/ckan` is a script for running paster commands on CKAN instances.
 
-(The directories follow the Debian directory structure for packaging.)
+`./activate` is a script for activating the CKAN virtual environment after it
+has been installed via the .deb package to `/usr/lib/ckan`. After creating the
+virtualenv, `build.sh` copies thie `activate` script over the virtualenv's
+default `activate` script.
 
-`./activate` is this supposed to be here?
+(The directories follow the Debian directory structure for packaging.)
