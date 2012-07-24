@@ -3,9 +3,9 @@ import sys
 import os
 from pkg_resources import load_entry_point
 
-assert os.getuid() in (33, 0), 'need to be root or www-data'
+assert os.getuid() in (1000, 0), 'need to be root or home user 1000'
 
-os.setuid(33)
+os.setuid(1000)
 
 paster_commands = ['create', 'help','make-config',
                    'points','post','request',

@@ -22,27 +22,12 @@ def after_install(options, pyenv):
             options.ckan_location])
 
     # Install additional CKAN dependencies into the virtual environment.
-    lucid_missing = os.path.join(ckan_dir, 'requires', 'lucid_missing.txt')
+    requirements = os.path.join(ckan_dir, 'pip-requirements.txt')
     subprocess.call([pip, 'install', '--ignore-installed', '-r',
-            lucid_missing])
-    lucid_conflict = os.path.join(ckan_dir, 'requires', 'lucid_conflict.txt')
-    subprocess.call([pip, 'install', '--ignore-installed', '-r',
-            lucid_conflict])
-    subprocess.call([pip, 'install', '--ignore-installed', 'webob==1.0.8'])
-
-    # Install the remaining dependencies into the virtual environment.
-    # With no --ignore-installed option in the command below, if any of these
-    # packages are already installed by apt (which is the preferred way to
-    # install them because it's faster), this command should just skip them.
-    lucid_present = os.path.join(ckan_dir, 'requires', 'lucid_present.txt')
-    subprocess.call([pip, 'install', '-r', lucid_present])
-
-    # At this point we need to install paster into the virtual environment
-    # (if the commands above didn't do so already).
-    subprocess.call([pip, 'install', '--ignore-installed', 'PasteScript'])
-    paster = os.path.join(pyenv, 'bin', 'paster')
+            requirements])
 
     # Create a CKAN config file.
+    paster = os.path.join(pyenv, 'bin', 'paster')
     development_ini = os.path.join(ckan_dir, 'development.ini')
     subprocess.call([paster, 'make-config', 'ckan', '--no-interactive', development_ini])
 
