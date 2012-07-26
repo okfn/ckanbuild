@@ -11,9 +11,20 @@ To use ckanbuild you must first install the following dependencies:
 * [virtualenv](http://www.virtualenv.org/): `pip install virtualenv`
 * [fpm](https://github.com/jordansissel/fpm/): `gem install fpm`
 
+For example, to install these dependencies on Ubuntu 12.04:
+
+    sudo apt-get install python git python-virtualenv rubygems
+    sudo gem install fpm
+
+There are further dependencies that need to be satisifed in order to build the
+packages required by ckan:
+
+    sudo apt-get install python-dev libpq-dev
+
 Then to get ckanbuild itself simply clone the ckanbuild git repo:
 
     git clone https://github.com/okfn/ckanbuild.git
+
 
 Usage
 -----
@@ -21,6 +32,31 @@ Usage
 To build the CKAN Debian package, run:
 
     ./build.sh
+
+
+Preparing the host machine
+--------------------------
+
+The host machine is the machine that will host the deployment.  Assuming it's a
+fresh installation of Ubuntu 12.04 Server Edition (64 bit):
+
+    # Install dependencies
+    sudo apt-get install postgresql-9.1 postgresql-9.1-postgis solr-jetty openjdk-6-jdk apache2 libapache2-mod-wsgi nginx
+
+    # Configure jetty
+    sudo sed -e 's/#JAVA_HOME=/JAVA_HOME=\/usr\/lib\/jvm\/java-1.6.0-openjdk-amd64\//g' \
+             -e 's/#JETTY_PORT=8080/JETTY_PORT=8983/g' \
+             -e 's/#JETTY_HOST.*/JETTY_HOST=127.0.0.1/g' \
+             -e 's/NO_START=1/NO_START=0/g' \
+             -i /etc/default/jetty
+    sudo service jetty restart
+
+    # TODO: install and configure elastic search
+
+    # Check services are running:
+    curl http://127.0.0.1:8983/solr/admin/ping
+    /etc/init.d/postgresql status
+
 
 Troubleshooting
 ---------------
