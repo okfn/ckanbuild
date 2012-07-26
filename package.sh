@@ -29,6 +29,8 @@ sudo fpm -t deb \
       -v 1.8b \
       --iteration `date "+%Y%m%d%H%M%S"` \
       -d 'python-virtualenv' \
+      -d 'solr-common' \
+      --replaces 'solr-common' \
       --config-files '/etc/solr/conf/schema.xml' \
       ./usr ./etc
 
