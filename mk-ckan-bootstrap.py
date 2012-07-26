@@ -11,6 +11,7 @@ def extend_parser(optparse_parser):
 def after_install(options, pyenv):
 
     pip = os.path.join(pyenv, 'bin', 'pip')
+    download_cache = os.path.join(pyenv, '..', 'pip_download_cache')
 
     if options.ckan_location.startswith('git+'):
         ckan_dir = os.path.join(pyenv, 'src', 'ckan')
@@ -18,12 +19,11 @@ def after_install(options, pyenv):
         ckan_dir = options.ckan_location
 
     # Install the CKAN source code into the virtual environment.
-    subprocess.call([pip, 'install', '--ignore-installed', '-e',
-            options.ckan_location])
+    subprocess.call([pip, 'install', '--download-cache=%s' % download_cache, '-e', options.ckan_location])
 
     # Install additional CKAN dependencies into the virtual environment.
     requirements = os.path.join(ckan_dir, 'pip-requirements.txt')
-    subprocess.call([pip, 'install', '--ignore-installed', '-r',
+    subprocess.call([pip, 'install', '--download-cache=%s' % download_cache, '--use-mirrors', '-r',
             requirements])
 
     # Create a CKAN config file.
@@ -38,7 +38,7 @@ def after_install(options, pyenv):
 
     # Install CKAN's test-specific dependencies into the virtual environment.
     pip_requirements_test = os.path.join(ckan_dir, 'pip-requirements-test.txt')
-    subprocess.call([pip, 'install', '--ignore-installed', '-r',
+    subprocess.call([pip, 'install', '--use-mirrors', '--download-cache=%s' % download_cache, '-r',
             pip_requirements_test])
 """))
 f = open('ckan-bootstrap.py', 'w').write(output)
