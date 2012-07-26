@@ -29,9 +29,36 @@ Then to get ckanbuild itself simply clone the ckanbuild git repo:
 Usage
 -----
 
-To build the CKAN Debian package, run:
+The idea behind ckanbuild is to incrementally build your python virtualenv,
+starting with the simplest base case of ckan and its dependencies.  The tools
+with which to do this are a bit immature and fragmented at the moment, so it's
+still quite manual...:
 
-    ./build.sh
+First, build the base virtualenv:
+
+    # This will generate a bootstrap file.
+    python mk-ckan-bootstrap.py
+
+    # This will create a new virtualenv in ./build/usr/lib/ckan
+    python ckan-bootstrap.py ./build/usr/lib/ckan
+
+You can now add further dependencies to your pyenv (this is still very manual):
+
+    # Activate the virtualenv
+    source ./build/usr/lib/ckan/bin/activate
+
+    # Install something useful
+    # And don't forget to install any of its dependencies too...
+    pip install -e git+https://github.com/okfn/ckanext-qa.git#egg=ckan
+
+    # Once your done you can deactivate the virtualenv
+    deactivate
+
+When you're happy with your virtualenv, it's time to package it up:
+
+    ./package.sh ./build
+
+All going well, you should end up with a debian package in ./build
 
 
 Preparing the host machine

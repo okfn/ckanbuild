@@ -1,4 +1,6 @@
 /usr/lib/*
 *.swp
 *.deb
-ckan-bootstrap.sh
+ckan-bootstrap.py
+build
+pip-cache
