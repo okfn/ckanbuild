@@ -32,6 +32,7 @@ sudo fpm -t deb \
       -d 'solr-common' \
       --replaces 'solr-common' \
       --config-files '/etc/solr/conf/schema.xml' \
+      --post-install '../packaging_scripts/post-install.sh' \
       ./usr ./etc
 
 cd -
