@@ -1,3 +1,4 @@
 /usr/lib/*
 *.swp
 *.deb
+ckan-bootstrap.sh
