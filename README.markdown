@@ -49,7 +49,7 @@ You can now add further dependencies to your pyenv (this is still very manual):
 
     # Install something useful
     # And don't forget to install any of its dependencies too...
-    pip install -e git+https://github.com/okfn/ckanext-qa.git#egg=ckan
+    pip install -e git+https://github.com/okfn/ckanext-qa.git#egg=ckanext-qa
 
     # Once your done you can deactivate the virtualenv
     deactivate
