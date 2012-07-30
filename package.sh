@@ -32,6 +32,7 @@ sudo fpm -t deb \
       -d 'python-virtualenv' \
       -d 'apache2' \
       --replaces 'apache2' \
+      --replaces 'apache2.2-common' \
       --config-files '/etc/apache2/ports.conf' \
       --post-install '../packaging_scripts/post-install.sh' \
       ./usr ./etc
