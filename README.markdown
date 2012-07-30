@@ -64,8 +64,14 @@ All going well, you should end up with a debian package in ./build
 Preparing the host machine
 --------------------------
 
-The host machine is the machine that will host the deployment.  Assuming it's a
-fresh installation of Ubuntu 12.04 Server Edition (64 bit):
+The host machine is the machine that will host the deployment.  
+
+Different types/classes/profiles of servers have different scripts which can be run on them. To configure a webserver, and assuming the ckanbuild has been installed you should run:
+
+    . bin/webserver.sh
+
+Otherwise assuming it's a fresh installation of Ubuntu 12.04 Server Edition (64 bit):
+
 
     # Install dependencies
     sudo apt-get install postgresql-9.1 postgresql-9.1-postgis solr-jetty openjdk-6-jdk apache2 libapache2-mod-wsgi nginx
