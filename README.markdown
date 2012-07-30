@@ -68,7 +68,11 @@ The host machine is the machine that will host the deployment.
 
 Different types/classes/profiles of servers have different scripts which can be run on them. To configure a webserver, and assuming the ckanbuild has been installed you should run:
 
-    . bin/webserver.sh
+    bin/webserver.sh
+
+To install the database machine:
+
+    bin/dbserver.sh
 
 Otherwise assuming it's a fresh installation of Ubuntu 12.04 Server Edition (64 bit):
 
