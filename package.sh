@@ -30,6 +30,9 @@ sudo fpm -t deb \
       -v 1.8b \
       --iteration `date "+%Y%m%d%H%M%S"` \
       -d 'python-virtualenv' \
+      -d 'apache2' \
+      --replaces 'apache2' \
+      --config-files '/etc/apache2/ports.conf' \
       --post-install '../packaging_scripts/post-install.sh' \
       ./usr ./etc
 
