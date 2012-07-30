@@ -20,7 +20,7 @@ cp -r ./etc "$WD/etc"
 ## mkdir -p "$WD/etc/solr/conf"
 ## cp "$WD/usr/lib/ckan/src/ckan/ckan/config/solr/schema-1.4.xml" "$WD/etc/solr/conf/schema.xml"
 ## 
-## cd "$WD"
+cd "$WD"
 
 # For some reason I need to be root to run this.  I'm sure this shouldn't be
 # the case.
@@ -30,9 +30,6 @@ sudo fpm -t deb \
       -v 1.8b \
       --iteration `date "+%Y%m%d%H%M%S"` \
       -d 'python-virtualenv' \
-##       -d 'solr-common' \
-##       --replaces 'solr-common' \
-##       --config-files '/etc/solr/conf/schema.xml' \
       --post-install '../packaging_scripts/post-install.sh' \
       ./usr ./etc
 

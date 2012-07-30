@@ -1,0 +1,7 @@
+#!/bin/bash
+
+## We opened up the elastic search port, 9200, on s071.okserver.org to accept
+## connections from demo1.ckan on its internal ip address.
+## This is the command we ran to do so:
+
+sudo ufw allow proto tcp from 10.181.160.49 to 10.176.32.42 port 9200
