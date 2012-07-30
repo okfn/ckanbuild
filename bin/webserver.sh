@@ -15,7 +15,10 @@ sudo $APT install nginx
 sudo $APT install python-virtualenv
 sudo $APT install libpq-dev python-dev
 
+sudo cp etc/apache2/sites-available/ckan /etc/apache2/sites-available/
+
+sudo a2ensite ckan
 sudo a2dissite default
 sudo service apache2 reload
-#sudo a2ensite ckan
-#vim /etc/apache2/sites-enabled/ckan
+
+vim /etc/apache2/sites-enabled/ckan
