@@ -9,7 +9,6 @@ while true; do
     esac
 done
 
-
 echo ""
 read -p "Please enter the IP for the SOLR server? " SOLR
 read -p "Please enter the IP for the DATABASE server? " DATABASE
@@ -30,15 +29,15 @@ while true; do
     esac
 done
 
-function check_hosts() {
+check_hosts() {
     if grep -q "$1" /etc/hosts
     then
         echo "$1 was found in /etc/hosts"
-        exit
     else
         echo "$2 $1" | sudo tee -a /etc/hosts
     fi
 }
+
 check_hosts 'solrserver' $SOLR
 check_hosts 'dbserver' $DATABASE
 check_hosts 'elasticserver' $ELASTIC
