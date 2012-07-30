@@ -1,5 +1,15 @@
 #!/bin/sh
 
+while true; do
+    read -p "Have you written down the IPs for solr, database and elastic search [y/n]? " yn
+    case $yn in
+        [Yy]* ) break;;
+        [Nn]* ) exit;;
+        * ) echo "Please answer yes or no.";;
+    esac
+done
+
+
 echo ""
 read -p "Please enter the IP for the SOLR server? " SOLR
 read -p "Please enter the IP for the DATABASE server? " DATABASE
@@ -12,7 +22,7 @@ echo " ELASTIC -> $ELASTIC"
 echo ""
 
 while true; do
-    read -p "Should we run with those values? " yn
+    read -p "Should we run with those values [y/n]? " yn
     case $yn in
         [Yy]* ) break;;
         [Nn]* ) exit;;
