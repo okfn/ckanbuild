@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 # only run with no arguments
 if [ $# -eq 0 ] ; then
@@ -61,11 +61,37 @@ randpass() {
 }
 
 createdb() {
+    local PASSWORD
+    local DB_NAME
+    DB_NAME=$1
+
+    if [ "X" == "X$DB_NAME" ]
+    then
+        echo "ERROR: Invalid database name: $DB_NAME"
+	return 1
+    fi
+
+    # Check if the database already exists.
+    COMMAND_OUTPUT=`su - postgres -c "psql -c \"select datname from pg_database where datname='$DB_NAME'\""`
+    if [[ "$COMMAND_OUTPUT" =~ ${DB_NAME} ]] ; then
+	echo "ERROR: Database \"${DB_NAME}\" already exists.  Aborting."
+	return 1
+    fi
+
+    # Check if the user already exists.
+    COMMAND_OUTPUT=`su - postgres -c "psql -c \"SELECT 'True' FROM pg_user WHERE usename='${DB_NAME}'\""`
+    if [[ "$COMMAND_OUTPUT" =~ True ]] ; then
+        echo "ERROR: User \"${DB_NAME}\" already exists.  Aborting."
+	return 1
+    fi
+
     PASSWORD=`randpass`
     echo "Suggested password is:"
     echo $PASSWORD
-    sudo -u postgres createuser -DRSP $1
-    sudo -u postgres createdb -O $1 $1
+    sudo -u postgres createdb -O $DB_NAME $DB_NAME
+    sudo -u postgres createuser -DRSP $DB_NAME
+
+    # su - postgres -c "psql -c \"ALTER USER \\\"${INSTANCE}\\\" WITH PASSWORD '${password}'\""
 }
 
 addweb() {
