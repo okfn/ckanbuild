@@ -94,14 +94,35 @@ createdb() {
     # su - postgres -c "psql -c \"ALTER USER \\\"${INSTANCE}\\\" WITH PASSWORD '${password}'\""
 }
 
+PG_PORT="5432"
+SOLR_PORT="8983"
+
 addweb() {
-   sudo ufw allow in on eth1 proto tcp from $1 to any port 5432
-   sudo ufw allow in on eth1 proto tcp from $1 to any port 8983
+    local IP_ADDRESS
+    IP_ADDRESS=$1
+
+    if [ "X" == "X$IP_ADDRESS" ]
+    then
+        echo "ERROR: Invalid ip address: $IP_ADDRESS"
+	return 1
+    fi
+
+   sudo ufw allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$PG_PORT"
+   sudo ufw allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$SOLR_PORT"
 }
 
 removeweb() {
-   sudo ufw delete allow in on eth1 proto tcp from $1 to any port 5432
-   sudo ufw delete allow in on eth1 proto tcp from $1 to any port 8983
+    local IP_ADDRESS
+    IP_ADDRESS=$1
+
+    if [ "X" == "X$IP_ADDRESS" ]
+    then
+        echo "ERROR: Invalid ip address: $IP_ADDRESS"
+	return 1
+    fi
+
+   sudo ufw delete allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$PG_PORT"
+   sudo ufw delete allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$SOLR_PORT"
 }
 
 case "$1" in
