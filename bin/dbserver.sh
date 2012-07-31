@@ -72,14 +72,14 @@ createdb() {
     DB_NAME=$1
 
     # Check if the database already exists.
-    COMMAND_OUTPUT=`su - postgres -c "psql -c \"select datname from pg_database where datname='$DB_NAME'\""`
+    COMMAND_OUTPUT=`sudo -u postgres psql -c "SELECT datname FROM pg_database WHERE datname='${DB_NAME}'"`
     if [[ "$COMMAND_OUTPUT" =~ ${DB_NAME} ]] ; then
 	echo "ERROR: Database \"${DB_NAME}\" already exists.  Aborting."
 	return 1
     fi
 
     # Check if the user already exists.
-    COMMAND_OUTPUT=`su - postgres -c "psql -c \"SELECT 'True' FROM pg_user WHERE usename='${DB_NAME}'\""`
+    COMMAND_OUTPUT=`sudo -u postgres psql -c "SELECT 'True' FROM pg_user WHERE usename='${DB_NAME}'"`
     if [[ "$COMMAND_OUTPUT" =~ True ]] ; then
         echo "ERROR: User \"${DB_NAME}\" already exists.  Aborting."
 	return 1
