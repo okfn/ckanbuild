@@ -50,6 +50,8 @@ init() {
        echo "host all all samenet md5" | sudo tee -a /etc/postgresql/9.1/main/pg_hba.conf
     fi
     
+    sudo service postgresql restart
+
     echo 'Setting up default firewall configuration...'
     sudo ufw default deny
     sudo ufw allow openssh
