@@ -90,8 +90,8 @@ createdb() {
     PASSWORD=`randpass`
     echo "Suggested password is:"
     echo $PASSWORD
-    sudo -u postgres createdb -O $DB_NAME $DB_NAME
     sudo -u postgres createuser -DRSP $DB_NAME
+    sudo -u postgres createdb -O $DB_NAME $DB_NAME
 
     return 0
 }
