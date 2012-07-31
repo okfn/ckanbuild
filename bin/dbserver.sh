@@ -22,7 +22,7 @@ init() {
     
     sudo sed -i 's/#JAVA_HOME=/JAVA_HOME=\/usr\/lib\/jvm\/java-1.6.0-openjdk-amd64\//g' /etc/default/jetty
     sudo sed -i 's/#JETTY_PORT=8080/JETTY_PORT=8983/g' /etc/default/jetty
-    sudo sed -i 's/#JETTY_HOST.*/JETTY_HOST=127.0.0.1/g' /etc/default/jetty
+    sudo sed -i 's/#JETTY_HOST.*/JETTY_HOST=0.0.0.0/g' /etc/default/jetty
     sudo sed -i 's/NO_START=1/NO_START=0/g' /etc/default/jetty
     
     sudo sed -i 's/^#kernel\.shmmax =.*/kernel.shmmax = 1143210240/' /etc/sysctl.d/30-postgresql-shm.conf
