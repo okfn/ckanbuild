@@ -45,6 +45,12 @@ if [ $# -eq 0 ] ; then
     fi
     
     exit 0
+
+    echo 'Setting up default firewall configuration...'
+    sudo ufw default deny
+    sudo ufw allow openssh
+    sudo ufw enable
+    echo 'Done setting up default firewall configuration.'
 fi
 
 
@@ -104,6 +110,4 @@ esac
 #sudo ufw allow in on eth1 proto tcp from 10.181.160.49 to any port 5432
 
 
-#sudo ufw default deny
-#sudo ufw allow OpenSSH
 
