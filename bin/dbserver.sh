@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Don't allow unset variables to be used
+set -o nounset
+
+# Exit upon any non-zero return code
+set -o errexit
+
 # only run with no arguments
 init() {
     
@@ -65,12 +71,6 @@ createdb() {
     local DB_NAME
     DB_NAME=$1
 
-    if [ "X" == "X$DB_NAME" ]
-    then
-        echo "ERROR: Invalid database name: $DB_NAME"
-	return 1
-    fi
-
     # Check if the database already exists.
     COMMAND_OUTPUT=`su - postgres -c "psql -c \"select datname from pg_database where datname='$DB_NAME'\""`
     if [[ "$COMMAND_OUTPUT" =~ ${DB_NAME} ]] ; then
@@ -101,12 +101,6 @@ addweb() {
     local IP_ADDRESS
     IP_ADDRESS=$1
 
-    if [ "X" == "X$IP_ADDRESS" ]
-    then
-        echo "ERROR: Invalid ip address: $IP_ADDRESS"
-	return 1
-    fi
-
    sudo ufw allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$PG_PORT"
    sudo ufw allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$SOLR_PORT"
 
@@ -117,19 +111,13 @@ removeweb() {
     local IP_ADDRESS
     IP_ADDRESS=$1
 
-    if [ "X" == "X$IP_ADDRESS" ]
-    then
-        echo "ERROR: Invalid ip address: $IP_ADDRESS"
-	return 1
-    fi
-
    sudo ufw delete allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$PG_PORT"
    sudo ufw delete allow in on eth1 proto tcp from "$IP_ADDRESS" to any port "$SOLR_PORT"
 
    return 0
 }
 
-case "$1" in
+case ${1-} in
     init) init ;;
     createdb) createdb $2 ;;
     dropdb) dropdb ;;
