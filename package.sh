@@ -14,6 +14,7 @@ virtualenv --relocatable "$WD/usr/lib/ckan"
 
 # Copy configuration templates into etc directory
 cp -r ./etc "$WD/etc"
+cp -r ./usr/bin "$WD/usr/"
 
 ## TODO: should we handle updating the solr schema on a remote machine?
 ## # Copy CKAN's solr schema
