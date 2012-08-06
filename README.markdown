@@ -42,6 +42,9 @@ First, build the base virtualenv:
     # This will create a new virtualenv in ./build/usr/lib/ckan
     python ckan-bootstrap.py ./build/usr/lib/ckan
 
+    # Or, to specify a particular ckan version:
+    python ckan-bootstrap.py --ckan-location=git+https://github.com/okfn/ckan.git#egg=ckan ./build/usr/lib/ckan
+
 You can now add further dependencies to your pyenv (this is still very manual):
 
     # Activate the virtualenv
