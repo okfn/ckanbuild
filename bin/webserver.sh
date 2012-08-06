@@ -68,12 +68,14 @@ configure_firewall() {
 open_tcp_port() {
     local PORT_NUMBER
     PORT_NUMBER=$1
+    sudo ufw allow in on eth0 proto tcp from any to any port "$PORT_NUMBER"
     sudo ufw allow in on eth1 proto tcp from any to any port "$PORT_NUMBER"
 }
 
 close_tcp_port() {
     local PORT_NUMBER
     PORT_NUMBER=$1
+    sudo ufw delete allow in on eth0 proto tcp from any to any port "$PORT_NUMBER"
     sudo ufw delete allow in on eth1 proto tcp from any to any port "$PORT_NUMBER"
 }
 
