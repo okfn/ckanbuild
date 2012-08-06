@@ -48,17 +48,23 @@ def after_install(options, pyenv):
     if not install_deps(dep=options.ckan_location):
         raise RuntimeError, "Couldn't install CKAN! :-("
 
-    # Newer versions of CKAN use a pip-requirements file, use that if it
-    # exists.  Otherwise fallback to the older files in requires/
-    requirements = os.path.join(ckan_dir, 'pip-requirements.txt')
-    if os.path.exists(requirements):
-        requirements_files = [requirements]
-    else:
-        requirements_files = [ os.path.join(ckan_dir, requires, f) for f in [
+    # Newer versions of CKAN use a pip-requirements file.  Older versions
+    # have a pip-requirements file, and a requires directory.  With older
+    # versions we use the contents of the requires directory, and ignore the
+    # pip-requirements file.
+    #
+    # If the requires directory exists, then install from there.  Otherwise,
+    # install from the pip-requirements file.
+    requirements_directory = os.path.join(ckan_dir, 'requires')
+    if os.path.exists(requirements_directory):
+        requirements_files = [ os.path.join(ckan_dir, 'requires', f) for f in [
             'lucid_present.txt',
             'lucid_conflict.txt',
             'lucid_missing.txt',
         ]]
+    else:
+        requirements_files = [os.path.join(ckan_dir, 'pip-requirements.txt')]
+    
     for f in requirements_files:
         success = install_deps(deps_file=requirements)
         if not success:
