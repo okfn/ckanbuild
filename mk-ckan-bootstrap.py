@@ -66,7 +66,7 @@ def after_install(options, pyenv):
         requirements_files = [os.path.join(ckan_dir, 'pip-requirements.txt')]
     
     for f in requirements_files:
-        success = install_deps(deps_file=requirements)
+        success = install_deps(deps_file=f)
         if not success:
             raise RuntimeError, "Couldn't install CKAN's dependencies"
 
