@@ -50,7 +50,7 @@ init() {
     sudo $APT install libapache2-mod-wsgi
     sudo $APT install nginx
 
-    configure_firewall()
+    configure_firewall
 }
 
 configure_firewall() {
