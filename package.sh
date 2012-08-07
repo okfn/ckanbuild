@@ -40,7 +40,7 @@ cp "$ROOT_DIR/packages/$CKAN_VERSION/pip-freeze-$DATE.txt" "$WD/usr/lib/ckan/pip
 
 # For some reason I need to be root to run this.  I'm sure this shouldn't be
 # the case.
-sudo fpm -t deb \
+fpm -t deb \
       -s dir \
       -n ckan \
       -v "$CKAN_VERSION" \
