@@ -10,6 +10,10 @@ def extend_parser(optparse_parser):
     optparse_parser.add_option('--pip-download-cache',
             default=os.path.join(os.getcwd(), 'pip-cache'),
             help="Where pip can store its cached downloads [default: %default]")
+    optparse_parser.add_option('--ignore-ckan-dependencies',
+            default=False,
+            action="store_true",
+            help="Don't install CKAN's dependencies.")
 
 def after_install(options, pyenv):
 
@@ -64,11 +68,12 @@ def after_install(options, pyenv):
         ]]
     else:
         requirements_files = [os.path.join(ckan_dir, 'pip-requirements.txt')]
-    
-    for f in requirements_files:
-        success = install_deps(deps_file=f)
-        if not success:
-            raise RuntimeError, "Couldn't install CKAN's dependencies"
+
+    if not options.ignore_ckan_dependencies:
+        for f in requirements_files:
+            success = install_deps(deps_file=f)
+            if not success:
+                raise RuntimeError, "Couldn't install CKAN's dependencies"
 
     # Create a CKAN config file.
     paster = os.path.join(pyenv, 'bin', 'paster')
