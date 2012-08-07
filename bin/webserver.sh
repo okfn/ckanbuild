@@ -63,6 +63,7 @@ configure_firewall() {
     sudo ufw default deny
     sudo ufw allow openssh
     open_tcp_port 80
+    sudo ufw enable
     echo 'Done setting up default firewall configuration.'
 }
 
