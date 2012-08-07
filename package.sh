@@ -1,5 +1,7 @@
 #!/bin/bash
 
+ROOT_DIR=$PWD
+
 # WorkingDirectory
 WD="$1"
 
@@ -38,7 +40,7 @@ sudo fpm -t deb \
       --replaces 'apache2' \
       --replaces 'apache2.2-common' \
       --config-files '/etc/apache2/ports.conf' \
-      --post-install '../packaging_scripts/post-install.sh' \
+      --post-install "$ROOT_DIR/packaging_scripts/post-install.sh" \
       ./usr ./etc
 
 cd -
