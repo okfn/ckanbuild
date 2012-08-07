@@ -69,6 +69,8 @@ def after_install(options, pyenv):
     else:
         requirements_files = [os.path.join(ckan_dir, 'pip-requirements.txt')]
 
+    paster = os.path.join(pyenv, 'bin', 'paster')
+    development_ini = os.path.join(ckan_dir, 'development.ini')
     if not options.ignore_ckan_dependencies:
         for f in requirements_files:
             success = install_deps(deps_file=f)
@@ -76,8 +78,6 @@ def after_install(options, pyenv):
                 raise RuntimeError, "Couldn't install CKAN's dependencies"
 
         # Create a CKAN config file.
-        paster = os.path.join(pyenv, 'bin', 'paster')
-        development_ini = os.path.join(ckan_dir, 'development.ini')
         subprocess.call([paster, 'make-config', 'ckan', '--no-interactive', development_ini])
         
         # Install CKAN's test-specific dependencies into the virtual environment.
@@ -89,8 +89,9 @@ def after_install(options, pyenv):
             print "No pip-requirements-test file, unable to install test requirements."
     else:
         print "CKAN's dependencies not installed.  This means you need to "
-              "install them yourself.  And generate the config file "
-              "afterwards:\n\n"
+        print "install them yourself.  And generate the config file "
+        print "afterwards:"
+        print
         print paster + " make-config ckan --no-interactive " + development_ini
 
     # Create CKAN's cache and session directories.
