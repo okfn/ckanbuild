@@ -3,7 +3,7 @@
 ROOT_DIR=$PWD
 
 # WorkingDirectory
-WD="$1"
+WD="$PWD/$1"
 
 if [[ "X" == "X$WD" ]]
 then
@@ -28,13 +28,23 @@ rsync -avr --update ./usr/bin "$WD/usr/"
 ## 
 cd "$WD"
 
+DATE=`date "+%Y%m%d%H%M%S"`
+CKAN_VERSION=`basename "$WD"`
+
+# Make a note of the virtualenv state before packaging it up.
+mkdir -p "$ROOT_DIR/packages/$CKAN_VERSION"
+"$WD/usr/lib/ckan/bin/pip" freeze > "$ROOT_DIR/packages/$CKAN_VERSION/pip-freeze-$DATE.txt"
+
+# And also, copy it into the package itself for record keeping.
+cp "$ROOT_DIR/packages/$CKAN_VERSION/pip-freeze-$DATE.txt" "$WD/usr/lib/ckan/pip-freeze.txt"
+
 # For some reason I need to be root to run this.  I'm sure this shouldn't be
 # the case.
 sudo fpm -t deb \
       -s dir \
       -n ckan \
-      -v 1.8b \
-      --iteration `date "+%Y%m%d%H%M%S"` \
+      -v "$CKAN_VERSION" \
+      --iteration "$DATE" \
       -d 'python-virtualenv' \
       -d 'apache2' \
       --replaces 'apache2' \
@@ -44,3 +54,5 @@ sudo fpm -t deb \
       ./usr ./etc
 
 cd -
+
+mv "$WD/ckan_${CKAN_VERSION}-${DATE}_amd64.deb" "$ROOT_DIR/packages/$CKAN_VERSION/"
