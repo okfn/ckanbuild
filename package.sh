@@ -12,9 +12,12 @@ fi
 # Makek the virtualenv relocatable
 virtualenv --relocatable "$WD/usr/lib/ckan"
 
-# Copy configuration templates into etc directory
-cp -r ./etc "$WD/etc"
-cp -r ./usr/bin "$WD/usr/"
+# Copy any missing configuration templates.
+# This allows custom templates to be packaged.
+# Using rsync with the --update flag means that any
+# new files in the target directory won't be overwritten.
+rsync -avr --update ./etc "$WD/etc"
+rsync -avr --update ./usr/bin "$WD/usr/"
 
 ## TODO: should we handle updating the solr schema on a remote machine?
 ## # Copy CKAN's solr schema
