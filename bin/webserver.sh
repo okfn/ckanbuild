@@ -49,6 +49,7 @@ init() {
     sudo $APT install apache2
     sudo $APT install libapache2-mod-wsgi
     sudo $APT install nginx
+    sudo $APT install python-virtualenv python-setuptools
 
     configure_firewall
 }
