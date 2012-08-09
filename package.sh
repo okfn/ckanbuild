@@ -55,4 +55,11 @@ sudo fpm -t deb \
 
 cd -
 
+## Cleanup
 mv "$WD/ckan_${CKAN_VERSION}-${DATE}_amd64.deb" "$ROOT_DIR/packages/$CKAN_VERSION/"
+
+## Run virtualenv on the pyenv (after having run 'virtualenv --relocatable' on it.
+## I've had problems installing deps on a pyenv that's had '--relocatable' run on
+## it, but this sorts it out.
+virtualenv "$WD/usr/lib/ckan"
+
