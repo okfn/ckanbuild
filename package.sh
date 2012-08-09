@@ -6,7 +6,9 @@ ROOT_DIR=$PWD
 ## are correct.
 ## Note: this doesn't change the modification timestamp.
 sudo find "$ROOT_DIR/etc" -type f -print -exec chown root {} \;
+sudo find "$ROOT_DIR/etc" -type f -print -exec chgrp root {} \;
 sudo chown okfn -R "$ROOT_DIR/etc/ckan"
+sudo chgrp okfn -R "$ROOT_DIR/etc/ckan"
 
 # WorkingDirectory
 WD="$PWD/$1"
