@@ -2,6 +2,12 @@
 
 ROOT_DIR=$PWD
 
+## Ensure the ownerships of the default configuration files
+## are correct.
+## Note: this doesn't change the modification timestamp.
+sudo find "$ROOT_DIR/etc" -type f -print -exec chown root {} \;
+sudo chown okfn -R "$ROOT_DIR/etc/ckan"
+
 # WorkingDirectory
 WD="$PWD/$1"
 
