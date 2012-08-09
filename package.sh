@@ -18,8 +18,11 @@ virtualenv --relocatable "$WD/usr/lib/ckan"
 # This allows custom templates to be packaged.
 # Using rsync with the --update flag means that any
 # new files in the target directory won't be overwritten.
-rsync -avr --update ./etc/ "$WD/etc"
-rsync -avr --update ./usr/bin "$WD/usr/"
+# The sudo is required to preserve ownership of the synced
+# (preserving ownership is implied by the '-a' flag, but
+# only works if run by the superuser.
+sudo rsync -avr --update ./etc/ "$WD/etc"
+sudo rsync -avr --update ./usr/bin "$WD/usr/"
 
 ## TODO: should we handle updating the solr schema on a remote machine?
 ## # Copy CKAN's solr schema
