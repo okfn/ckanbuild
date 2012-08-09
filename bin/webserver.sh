@@ -50,6 +50,7 @@ init() {
     sudo $APT install libapache2-mod-wsgi
     sudo $APT install nginx
     sudo $APT install python-virtualenv python-setuptools
+    sudo $APT install libpq5
 
     configure_firewall
 }
