@@ -50,7 +50,7 @@ fi
 # Directories to be cleaned, separated by white space.
 # Typical examples: CKAN sessions directories
 if [ -z "${DIRS_TO_CLEANUP}" ]; then
-  DIRS_TO_CLEANUP="/tmp/sstore/"
+  DIRS_TO_CLEANUP="/tmp/*/session/ /tmp/sstore/"
 fi
 
 # Remove everything which is older than how namy days?
