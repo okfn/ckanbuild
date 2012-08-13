@@ -32,20 +32,60 @@ Usage
 The idea behind ckanbuild is to incrementally build your python virtualenv,
 starting with the simplest base case of ckan and its dependencies.  The tools
 with which to do this are a bit immature and fragmented at the moment, so it's
-still quite manual...:
+still quite manual.
 
-First, build the base virtualenv:
+I've been using the following workflow and conventions:
+
+### Directory Layout on the build server
+
+ckanbuild has been extracted to `/home/okfn/build/ckanbuild` on s084.  From now
+on, I'll refer to directories relative to this one.  I've been using the
+following convention for organising the different builds:
+
+    ./builds
+    |--- 1.3.3-s075
+    |--- 1.5.1c-fixes-iati
+    |--- 1.7.1
+
+This shows 3 separate build projects.  The name of the project determines the
+name of the resulting package, so `1.3.3-s075` produces packages named like
+`ckan_1.3.3-s075-20120807131804_amd64.deb`.
+
+Each project acts as a kind of workspace to build up what you want packaged.  The packaging script currently only packages the two sub-directories `etc` and `usr`.  This means anything outside these two directories will not end up in the debian package.
+
+Each project has a README file with notes on how the pyenv was created, any
+problems encountered, and how they were resolved.  It also shows the extensions
+that are installed.  Although that's not really necessary as a `pip freeze`
+output is built and distributed with each built package, its useful to see at a
+glance what extensions are availble.
+
+### Creating a new project
+
+To create a new project:
 
     # This will generate a bootstrap file.
     python mk-ckan-bootstrap.py
 
-    # This will create a new virtualenv in ./build/usr/lib/ckan
-    python ckan-bootstrap.py ./build/usr/lib/ckan
+    # This will create a new virtualenv in ./builds/<project-name>/usr/lib/ckan
+    # The /usr/lib/ckan is very important, and should not be changed.
+    python ckan-bootstrap.py ./builds/<project-name>/usr/lib/ckan
+
+    # Alternatively, to specify a particular ckan version:
+    python ckan-bootstrap.py --ckan-location=git+https://github.com/okfn/ckan.git#egg=ckan \
+                             ./builds/<project-name>/usr/lib/ckan
+
+    # Also, a flag can be set to **not** automatically install CKAN's dependencies.
+    # This is useful if trying to build an old version of CKAN.
+    python ckan-bootstrap.py --ignore-ckan-dependencies \
+                             --ckan-location=git+https://github.com/okfn/ckan.git@release-v1.3.3#egg=ckan \
+                             ./builds/<project-name>/usr/lib/ckan
+
+### Installing further dependencies
 
 You can now add further dependencies to your pyenv (this is still very manual):
 
     # Activate the virtualenv
-    source ./build/usr/lib/ckan/bin/activate
+    source ./builds/<project-name>/usr/lib/ckan/bin/activate
 
     # Install something useful
     # And don't forget to install any of its dependencies too...
@@ -54,19 +94,52 @@ You can now add further dependencies to your pyenv (this is still very manual):
     # Once your done you can deactivate the virtualenv
     deactivate
 
-When you're happy with your virtualenv, it's time to package it up:
+Note: this can be run even after creating a package, to create a more up to
+date package.
 
-    ./package.sh ./build
+### Further configuration
 
-All going well, you should end up with a debian package in ./build
+As part of the packaging, any files in `./etc` and `./usr` (relative to the
+ckanbuild directory, not the project directory) are copied into the project
+directory **if** they are more up-to-date than the files already in the project
+directory.  This means you can selectively edit config files to be packaged, or
+add additional files to be packaged.
 
+Note: this isn't perfect.  If for example you merge some upstream changes in
+the ckanbuild repo that update files in `./etc`, then they'll be more
+up-to-date that the ones you may have edited in your project directory.  So
+please be careful, until this issue is sorted out!
 
-Preparing the host machine
+### Packaging
+
+When you're happy with your virtualenv and config files, it's time to package
+it up:
+
+    ./package.sh ./builds/<project-name>
+
+All going well, you should end up with a new debian file in
+`./packages/<project-name>`, and a `pip-freeze` file to match.
+
+On s084, this `./packages` directory is being
+[served](http://s084.okserver.org/packages/).  It's just a bog-standard
+listing, ie - it's **not** a repository.  Rather, it's just an easy way of
+downloading the package to the target machine.
+
+### Installing the package
+
+Finally, to install the packge on the target machine:
+
+    # After downloading it
+    sudo dpkg -i <debian-package-location>
+
+Preparing the target machine
 --------------------------
 
-The host machine is the machine that will host the deployment.  
+The target machine is the machine that will host the deployment.  
 
-Different types/classes/profiles of servers have different scripts which can be run on them. To configure a webserver, and assuming the ckanbuild has been installed you should run:
+Different types/classes/profiles of servers have different scripts which can be
+run on them. To configure a webserver, and assuming the ckanbuild has been
+installed you should run:
 
     bin/webserver.sh
 
@@ -126,10 +199,8 @@ and its dependencies into the virtualenv, create the CKAN config file, etc.
 To update `ckan-bootstrap.py` you would edit `mk-ckan-bootstrap.py` then run
 it to generate the new `ckan-bootstrap.py`.
 
-`build.sh` is a shell script that creates a CKAN virtualenv (using
-`ckan-bootstrap.py`) in `./usr/lib/ckan` and then uses
-[fpm](https://github.com/jordansissel/fpm) to package up the entire virtualenv
-into a Debian package.
+`package.sh` is a shell script that packages a virtualenv using
+[fpm](https://github.com/jordansissel/fpm).
 
 In `./etc/apache2/sites-available/ckan` there should be one Apache config file
 for each CKAN website on the server (todo).

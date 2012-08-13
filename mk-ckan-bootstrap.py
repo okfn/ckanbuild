@@ -10,6 +10,10 @@ def extend_parser(optparse_parser):
     optparse_parser.add_option('--pip-download-cache',
             default=os.path.join(os.getcwd(), 'pip-cache'),
             help="Where pip can store its cached downloads [default: %default]")
+    optparse_parser.add_option('--ignore-ckan-dependencies',
+            default=False,
+            action="store_true",
+            help="Don't install CKAN's dependencies.")
 
 def after_install(options, pyenv):
 
@@ -48,25 +52,53 @@ def after_install(options, pyenv):
     if not install_deps(dep=options.ckan_location):
         raise RuntimeError, "Couldn't install CKAN! :-("
 
-    # Install additional CKAN dependencies into the virtual environment.
-    requirements = os.path.join(ckan_dir, 'pip-requirements.txt')
-    if not install_deps(deps_file=requirements):
-        raise RuntimeError, "Couldn't install CKAN's dependencies! :-("
+    # Newer versions of CKAN use a pip-requirements file.  Older versions
+    # have a pip-requirements file, and a requires directory.  With older
+    # versions we use the contents of the requires directory, and ignore the
+    # pip-requirements file.
+    #
+    # If the requires directory exists, then install from there.  Otherwise,
+    # install from the pip-requirements file.
+    requirements_directory = os.path.join(ckan_dir, 'requires')
+    if os.path.exists(requirements_directory):
+        requirements_files = [ os.path.join(ckan_dir, 'requires', f) for f in [
+            'lucid_present.txt',
+            'lucid_conflict.txt',
+            'lucid_missing.txt',
+        ]]
+    else:
+        requirements_files = [os.path.join(ckan_dir, 'pip-requirements.txt')]
 
-    # Create a CKAN config file.
     paster = os.path.join(pyenv, 'bin', 'paster')
     development_ini = os.path.join(ckan_dir, 'development.ini')
-    subprocess.call([paster, 'make-config', 'ckan', '--no-interactive', development_ini])
+    if not options.ignore_ckan_dependencies:
+        for f in requirements_files:
+            success = install_deps(deps_file=f)
+            if not success:
+                raise RuntimeError, "Couldn't install CKAN's dependencies"
+
+        # Create a CKAN config file.
+        subprocess.call([paster, 'make-config', 'ckan', '--no-interactive', development_ini])
+        
+        # Install CKAN's test-specific dependencies into the virtual environment.
+        pip_requirements_test = os.path.join(ckan_dir, 'pip-requirements-test.txt')
+        if os.path.exists(pip_requirements_test):
+            if not install_deps(deps_file=pip_requirements_test):
+                raise RuntimeError, "Couldn't install CKAN's dependencies! :-("
+        else:
+            print "No pip-requirements-test file, unable to install test requirements."
+    else:
+        print "CKAN's dependencies not installed.  This means you need to "
+        print "install them yourself.  And generate the config file "
+        print "afterwards:"
+        print
+        print paster + " make-config ckan --no-interactive " + development_ini
 
     # Create CKAN's cache and session directories.
     data_dir = os.path.join(ckan_dir, 'data')
     sstore_dir = os.path.join(ckan_dir, 'sstore')
     subprocess.call(['mkdir', data_dir, sstore_dir])
 
-    # Install CKAN's test-specific dependencies into the virtual environment.
-    pip_requirements_test = os.path.join(ckan_dir, 'pip-requirements-test.txt')
-    if not install_deps(deps_file=pip_requirements_test):
-        raise RuntimeError, "Couldn't install CKAN's dependencies! :-("
 
 """))
 f = open('ckan-bootstrap.py', 'w').write(output)

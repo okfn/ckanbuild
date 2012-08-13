@@ -22,7 +22,8 @@
 ##
 ## 3.  ~~Jetty (solr) needs to be restarted due to the new schema file.~~
 ##
-## 4.  The CKAN application needs to be reloaded as well.
+## 4.  The CKAN application needs to be reloaded as well.  We reload nginx
+##     as well in case there were any changes to its config file(s).
 
 # Set bash to exit if any command exits with non-zero return code.
 set -e
@@ -38,8 +39,9 @@ case "$1" in
         ## # Step 3: Restart solr config
         ## service jetty restart
 
-        # Step 4: Reload wsgi app
-        touch /etc/ckan/apache.wsgi
+        # Step 4: Reload CKAN and nginx
+	service apache2 reload
+	service nginx reload
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)

@@ -1,5 +1,11 @@
 #!/bin/bash
 
+# Don't allow unset variables to be used
+set -o nounset
+
+# Exit upon any non-zero return code
+set -o errexit
+
 init() {
     while true; do
         read -p "Have you written down the IPs for solr, database and elastic search [y/n]? " yn
@@ -43,6 +49,37 @@ init() {
     sudo $APT install apache2
     sudo $APT install libapache2-mod-wsgi
     sudo $APT install nginx
+    sudo $APT install python-virtualenv python-setuptools
+    sudo $APT install libpq5
+
+    configure_firewall
+}
+
+configure_firewall() {
+    APT="apt-get -y"
+
+    sudo $APT install ufw
+
+    echo 'Setting up default firewall configuration...'
+    sudo ufw default deny
+    sudo ufw allow openssh
+    open_tcp_port 80
+    sudo ufw enable
+    echo 'Done setting up default firewall configuration.'
+}
+
+open_tcp_port() {
+    local PORT_NUMBER
+    PORT_NUMBER=$1
+    sudo ufw allow in on eth0 proto tcp from any to any port "$PORT_NUMBER"
+    sudo ufw allow in on eth1 proto tcp from any to any port "$PORT_NUMBER"
+}
+
+close_tcp_port() {
+    local PORT_NUMBER
+    PORT_NUMBER=$1
+    sudo ufw delete allow in on eth0 proto tcp from any to any port "$PORT_NUMBER"
+    sudo ufw delete allow in on eth1 proto tcp from any to any port "$PORT_NUMBER"
 }
 
 check_hosts() {
