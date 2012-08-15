@@ -58,6 +58,12 @@ init() {
     sudo ufw enable
     echo 'Done setting up default firewall configuration.'
 
+
+    echo 'Setting up backups'
+    DIR="$( cd -P "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+    sudo cp $DIR/pg_backup /etc/cron.daily
+
+
     return 0
 }
 
