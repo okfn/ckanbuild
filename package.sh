@@ -60,7 +60,8 @@ sudo fpm -t deb \
       -d 'apache2' \
       --replaces 'apache2' \
       --replaces 'apache2.2-common' \
-      --config-files '/etc/apache2/ports.conf' \
+      --config-files './etc/apache2/ports.conf' \
+      --config-files './etc/nginx/conf.d/elastic-search.conf' \
       --post-install "$ROOT_DIR/packaging_scripts/post-install.sh" \
       ./usr ./etc
 
