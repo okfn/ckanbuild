@@ -102,6 +102,43 @@ createdb() {
     return 0
 }
 
+create-datastore-db() {
+
+    local INSTANCE
+    INSTANCE=$1
+
+    cat <<EOF | sudo -u postgres psql -f -
+-- don't quote the datastoredb variable or create the database separately
+
+-- create the datastore database
+create database "${INSTANCE}-datastore";
+
+-- switch to the new database
+\c ${INSTANCE}-datastore;
+
+-- revoke permissions for the new user
+REVOKE CREATE ON SCHEMA public FROM PUBLIC;
+REVOKE USAGE ON SCHEMA public FROM PUBLIC;
+
+GRANT CREATE ON SCHEMA public TO ${INSTANCE};
+GRANT USAGE ON SCHEMA public TO ${INSTANCE};
+
+-- take connect permissions from main db
+REVOKE CONNECT ON DATABASE ${INSTANCE} FROM datastore;
+
+-- grant select permissions for read-only user
+GRANT CONNECT ON DATABASE "${INSTANCE}-datastore" TO datastore;
+GRANT USAGE ON SCHEMA public TO datastore;
+
+-- grant access to current tables and views
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO datastore;
+
+-- grant access to new tables and views by default
+ALTER DEFAULT PRIVILEGES FOR USER ${INSTANCE} IN SCHEMA public
+   GRANT SELECT ON TABLES TO datastore;
+EOF
+}
+
 PG_PORT="5432"
 SOLR_PORT="8983"
 
@@ -133,6 +170,7 @@ case ${1-} in
     addweb) addweb $2 ;;
     removeweb) removeweb $2 ;;
     listweb) listweb ;;
+    create-datastore-db) create-datastore-db $2 ;;
     *) echo "
 
 Commands are:
@@ -141,6 +179,7 @@ createdb 'dbname' # createdb and user
 drobdb 'dbname' # drop db and user
 addweb ipaddress # allow firewall to connect to webserver
 removeweb ipaddress # stop filerewall from connecting to webserver
+create-datastore-db 'instance-name' # create a datastore database for the given instance-name.
 "
 
 esac
