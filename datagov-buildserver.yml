@@ -1,5 +1,12 @@
 ---
 - hosts: build
+  vars_prompt:
+   - name: version
+     prompt: "Ckan Version"
+     private: False
+   - name: iteration
+     prompt: "Iteration"
+     private: False
   tasks: 
     - name: install epel
       action: command creates=/etc/yum.repos.d/epel.repo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
@@ -23,6 +30,7 @@
         - gcc-c++ 
         - make
         - bison
+        - httpd
     - name: install fpm
       action: command gem install fpm creates=/usr/bin/fpm
     - name: get ckan version
@@ -46,3 +54,34 @@
       action: pip requirements=/usr/lib/ckan/src/ckanext-spatial/pip-requirements.txt virtualenv=/usr/lib/ckan/
     - name: install requirements for harvest 
       action: pip requirements=/usr/lib/ckan/src/ckanext-harvest/pip-requirements.txt virtualenv=/usr/lib/ckan/
+
+    - name: create directories
+      action: file path=$item state=directory
+      with_items:
+        - /etc/ckan
+
+    - name: copy all needed files
+      action: copy src=$item dest=/$item
+      with_items:
+        - etc/ckan/who.ini
+        - etc/ckan/apache.wsgi
+        - etc/cron.daily/remove_old_sessions
+
+    - name: copy production.ini
+      action: copy src=datagov_config/production.ini dest=/etc/ckan/production.ini
+
+    - name: copy ckan.ini
+      action: copy src=datagov_config/ckan.ini dest=/etc/ckan/ckan.ini
+
+    - name: copy apache
+      action: copy src=etc/apache2/sites-available/ckan dest=/etc/httpd/conf.d/ckan
+
+    - name: copy ckan command 
+      action: copy src=ckanroot dest=/usr/bin/ckan
+
+    - name: set correct apache port
+      action: lineinfile dest=/etc/httpd/conf/httpd.conf regexp=^Listen.* line='Listen 8080'
+
+    - name: build rpm
+      action: command fpm -t rpm -s dir -n geo.data.gov --iteration $iteration -v $version -d nginx -d httpd -d supervisord -d rabbitmq --config-files /etc/httpd/conf.d/ckan --config-files /etc/ckan/ckan.ini /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/cron.daily/remove_old_sessions /etc/httpd/conf.d/ckan
+
