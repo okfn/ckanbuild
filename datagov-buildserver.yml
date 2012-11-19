@@ -1,0 +1,48 @@
+---
+- hosts: build
+  tasks: 
+    - name: install epel
+      action: command creates=/etc/yum.repos.d/epel.repo rpm -Uvh http://download.fedoraproject.org/pub/epel/6/i386/epel-release-6-7.noarch.rpm
+    - name: make sure packages are installed 
+      action: yum pkg=$item state=installed
+      with_items:
+        - htop
+        - rubygems
+        - python-virtualenv
+        - python-setuptools
+        - git
+        - python-devel
+        - ruby-devel
+        - postgresql-libs
+        - postgresql-devel
+        - libxml2-devel
+        - libxslt-devel
+        - postgresql
+        - rpmdevtools
+        - gcc 
+        - gcc-c++ 
+        - make
+        - bison
+    - name: install fpm
+      action: command gem install fpm creates=/usr/bin/fpm
+    - name: get ckan version
+      action: git repo=https://github.com/okfn/ckan dest=/usr/lib/ckan/src/ckan # version=release-0.22
+    - name: get pip
+      action: easy_install name=pip
+
+    - name: install requirements and make virtualenv
+      action: pip requirements=/usr/lib/ckan/src/ckan/pip-requirements.txt virtualenv=/usr/lib/ckan/
+    - name: run setup.py develop for ckan
+      action: command chdir=/usr/lib/ckan/src/ckan/ ../../bin/python setup.py develop
+
+    - name: get geodatagov
+      action: git repo=https://github.com/okfn/ckanext-geodatagov dest=/usr/lib/ckan/src/ckanext-geodatagov # version=release-0.22
+    - name: install requirements for geodatagov
+      action: pip requirements=/usr/lib/ckan/src/ckanext-geodatagov/pip-requirements.txt virtualenv=/usr/lib/ckan/
+    - name: run setup.py develop for geodatagov
+      action: command chdir=/usr/lib/ckan/src/ckan/ ../../bin/python setup.py develop
+
+    - name: install requirements for spacial 
+      action: pip requirements=/usr/lib/ckan/src/ckanext-spatial/pip-requirements.txt virtualenv=/usr/lib/ckan/
+    - name: install requirements for harvest 
+      action: pip requirements=/usr/lib/ckan/src/ckanext-harvest/pip-requirements.txt virtualenv=/usr/lib/ckan/
