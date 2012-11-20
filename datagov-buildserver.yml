@@ -31,6 +31,8 @@
         - make
         - bison
         - httpd
+        - createrepo
+        - mod_wsgi
     - name: install fpm
       action: command gem install fpm creates=/usr/bin/fpm
     - name: get ckan version
@@ -59,6 +61,7 @@
       action: file path=$item state=directory
       with_items:
         - /etc/ckan
+        - /var/www/ckan-repo
 
     - name: copy all needed files
       action: copy src=$item dest=/$item
@@ -74,14 +77,21 @@
       action: copy src=datagov_config/ckan.ini dest=/etc/ckan/ckan.ini
 
     - name: copy apache
-      action: copy src=etc/apache2/sites-available/ckan dest=/etc/httpd/conf.d/ckan
+      action: copy src=datagov_config/ckan.conf dest=/etc/httpd/conf.d/ckan.conf
 
     - name: copy ckan command 
       action: copy src=ckanroot dest=/usr/bin/ckan
 
-    - name: set correct apache port
-      action: lineinfile dest=/etc/httpd/conf/httpd.conf regexp=^Listen.* line='Listen 8080'
+    - name: copy repo apache config
+      action: copy src=datagov_config/ckan-repo.conf dest=/etc/httpd/conf.d/ckan-repo.conf
+
+    - name: restart apache
+      action: service name=httpd state=restarted
+
+    - name: remove old repo
+      action: command rm -rf /var/www/ckan-repo/*
 
     - name: build rpm
-      action: command fpm -t rpm -s dir -n geo.data.gov --iteration $iteration -v $version -d nginx -d httpd -d supervisord -d rabbitmq --config-files /etc/httpd/conf.d/ckan --config-files /etc/ckan/ckan.ini /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/cron.daily/remove_old_sessions /etc/httpd/conf.d/ckan
-
+      action: command chdir=/var/www/ckan-repo/ fpm -t rpm -s dir -n geo.data.gov --iteration $iteration -v $version -d nginx -d httpd -d supervisor -d rabbitmq-server --config-files /etc/ckan/ckan.ini --config-files /etc/httpd/conf.d/ckan.conf /usr/bin/ckan /usr/lib/ckan/ /etc/ckan/ /etc/cron.daily/remove_old_sessions /etc/httpd/conf.d/ckan.conf
+    - name: create repo
+      action: command createrepo /var/www/ckan-repo/
