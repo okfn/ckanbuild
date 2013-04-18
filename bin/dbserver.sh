@@ -8,9 +8,9 @@ set -o errexit
 
 # only run with no arguments
 init() {
-    
+
     APT="apt-get -y --quiet"
-    
+
     sudo $APT install htop
     sudo $APT install postgresql-9.1
     sudo $APT install postgresql-9.1-postgis
@@ -19,37 +19,37 @@ init() {
     sudo $APT install openjdk-6-jdk
     sudo $APT install ufw
     sudo $APT install pgtune
-    
+
     sudo sed -i 's/#JAVA_HOME=/JAVA_HOME=\/usr\/lib\/jvm\/java-1.6.0-openjdk-amd64\//g' /etc/default/jetty
     sudo sed -i 's/#JETTY_PORT=8080/JETTY_PORT=8983/g' /etc/default/jetty
     sudo sed -i 's/#JETTY_HOST.*/JETTY_HOST=0.0.0.0/g' /etc/default/jetty
     sudo sed -i 's/NO_START=1/NO_START=0/g' /etc/default/jetty
-    
+
     sudo sed -i 's/^#kernel\.shmmax =.*/kernel.shmmax = 1143210240/' /etc/sysctl.d/30-postgresql-shm.conf
-    
+
     sudo sysctl -p /etc/sysctl.d/30-postgresql-shm.conf
-    
+
     sudo mv /etc/solr/conf/schema.xml /etc/solr/conf/schema.xml.bak
-    
+
     sudo cp /etc/postgresql/9.1/main/postgresql.conf  /etc/postgresql/9.1/main/postgresql.conf.bak
     sudo pgtune -i /etc/postgresql/9.1/main/postgresql.conf -o /etc/postgresql/9.1/main/postgresql.conf
-    
+
     sudo sed -i "s/^#listen_addresses =.*/listen_addresses = '*'/" /etc/postgresql/9.1/main/postgresql.conf
-    
-    wget https://raw.github.com/okfn/ckan/master/ckan/config/solr/schema-1.4.xml
-    
-    sudo cp schema-1.4.xml /etc/solr/conf/schema.xml
-    rm schema-1.4.xml
-    
+
+    wget https://raw.github.com/okfn/ckan/master/ckan/config/solr/schema-2.0.xml
+
+    sudo cp schema-2.0.xml /etc/solr/conf/schema.xml
+    rm schema-2.0.xml
+
     sudo service jetty restart
-    
+
     if sudo grep -q "samenet md5" /etc/postgresql/9.1/main/pg_hba.conf
     then
        echo "samenet was found in /etc/postgresql/9.1/main/pg_hba.conf"
     else
        echo "host all all samenet md5" | sudo tee -a /etc/postgresql/9.1/main/pg_hba.conf
     fi
-    
+
     sudo service postgresql restart
 
     echo 'Setting up default firewall configuration...'
